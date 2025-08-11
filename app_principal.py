@@ -9,6 +9,7 @@ import dashboard_eficiencia
 # Crea la aplicación principal de Dash
 app = dash.Dash(__name__, suppress_callback_exceptions=True)
 app.title = "Dashboard Principal"
+server = app.server
 
 # Define el layout principal con pestañas
 app.layout = html.Div(style={'backgroundColor': '#2c2c2c'}, children=[
