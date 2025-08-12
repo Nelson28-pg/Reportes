@@ -94,11 +94,11 @@ def crear_heatmap(df_grupo, df_2025_grupo, titulo, color_scale_2025, color_scale
         title={'text': titulo, 'x': 0.05, 'xanchor': 'left', 'font': {'size': 16, 'color': 'white'}},
         paper_bgcolor="#2c2c2c", plot_bgcolor='rgba(0,0,0,0)', font_color="white",
         height=max(300, len(df_final.index) * 40 + 120),
-        margin=dict(l=120, r=100, t=140, b=80), showlegend=False
+        margin=dict(l=180, r=100, t=140, b=80), showlegend=False
     )
     
-    fig.update_xaxes(showgrid=False)
-    fig.update_yaxes(showgrid=False)
+    fig.update_xaxes(showgrid=False, automargin=False, title_standoff=45, ticklen=4, ticks="outside", tickcolor='#2c2c2c', tickfont=dict(size=11))
+    fig.update_yaxes(showgrid=False, automargin=False, title_standoff=45, ticklen=6, ticks="outside", tickcolor='#2c2c2c', tickfont=dict(size=11))
 
     return fig
 
@@ -141,7 +141,7 @@ def get_layout():
         style={
             "backgroundColor": "#2c2c2c", 
             "color": "white", 
-            "padding": "15px", 
+            "padding": "10px", 
             "fontFamily": "Arial, sans-serif",
             "minHeight": "100vh"
         },

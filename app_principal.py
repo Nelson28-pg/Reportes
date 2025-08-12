@@ -13,19 +13,19 @@ server = app.server
 
 # Define el layout principal con pestañas
 app.layout = html.Div(style={'backgroundColor': '#2c2c2c', 'margin': '0px', 'padding': '0px', 'height': '100vh'}, children=[
-        html.H1('Panel de Cobranza No Coactiva', style={"fontFamily": "'Roboto', serif", 'textAlign': 'center', 'color': '#FFFFFF', 'backgroundColor': '#1a1a1a', 'padding': '25px', 'marginBottom': 0, 'marginTop': '0px'}),
+        html.H2('💼 DASHBOARD  COBRANZA NO COACTIVA', style={"fontFamily": "'Segoe UI', sans-serif", 'textAlign': 'center', 'color': '#FFFFFF', 'backgroundColor': '#1a1a1a', 'padding': '25px', 'marginBottom': 0, 'marginTop': '0px'}),
     dcc.Tabs(id="tabs-principal", value='tab-derivaciones', children=[
         dcc.Tab(
             label=' | EEM Derivados y Cancelados |',
             value='tab-derivaciones',
-            style={'color': 'white', 'backgroundColor': '#2c2c2c', 'padding': '10px 6px', 'border': '1px solid #2c2c2c', 'borderRadius': '1px'},
-            selected_style={'color': '#FFFFFF', 'backgroundColor': '#1a1a1a', 'padding': '10px 6px', 'fontWeight': 'bold', 'border': '1px solid #00FFFF', 'borderRadius': '18px'}
+            style={"fontFamily": "'Segoe UI', sans-serif", 'color': "#8F8E8E", 'backgroundColor': '#2c2c2c', 'padding': '10px 6px', 'border': '1px solid #2c2c2c', 'borderRadius': '1px'},
+            selected_style={"fontFamily": "'Segoe UI', sans-serif", 'color': '#EFEFEF', 'backgroundColor': '#1a1a1a', 'padding': '10px 6px', 'margin': '0px 11px', 'fontWeight': 'bold', 'border': '1px solid #00FFFF', 'borderRadius': '18px'}
         ),
         dcc.Tab(
-            label='| Eficiencia de Cobranza |',
+            label='| Eficiencia de EEM Cancelados |',
             value='tab-eficiencia',
-            style={'color': 'white', 'backgroundColor': '#2c2c2c', 'padding': '10px 6px', 'border': '1px solid #2c2c2c', 'borderRadius': '1px'},
-            selected_style={'color': 'FFFFFF', 'backgroundColor': '#1a1a1a', 'padding': '10px 6px', 'fontWeight': 'bold', 'border': '1px solid #00FFFF', 'borderRadius': '18px'}
+            style={"fontFamily": "'Segoe UI', sans-serif", 'color': '#8F8E8E', 'backgroundColor': '#2c2c2c', 'padding': '10px 6px', 'border': '1px solid #2c2c2c', 'borderRadius': '1px'},
+            selected_style={"fontFamily": "'Segoe UI', sans-serif", 'color': "#EFEFEF", 'backgroundColor': '#1a1a1a', 'padding': '10px 6px', 'margin': '0px -11px', 'fontWeight': 'bold', 'border': '1px solid #00FFFF', 'borderRadius': '18px'}
         ),
     ]),
     html.Div(id='contenido-tab', style={'backgroundColor': '#2c2c2c'})

@@ -132,7 +132,7 @@ radio_item_selected_style = {
 def get_layout():
     layout = html.Div(
         className='dashboard-content',
-        style={"backgroundColor": "#2c2c2c", "color": "white", "padding": "15px", "fontFamily": "Arial, sans-serif"},
+        style={"backgroundColor": "#2c2c2c", "color": "white", "padding": "10px", "fontFamily": "Arial, sans-serif"},
         children=[
             dcc.Store(id='store-selected-year-derivaciones', data=anios_filtrables[0] if anios_filtrables else None),
             html.Div(
