@@ -58,13 +58,13 @@ def crear_grafico_derivaciones_eficiencia(df_anio):
     # Calcular promedio de eficiencia para el año
     promedio_eficiencia_anio = df_agg['eficiencia_promedio'].mean()
 
-    fig = make_subplots(rows=2, cols=1, shared_xaxes=False, vertical_spacing=0.1,
+    fig = make_subplots(rows=2, cols=1, shared_xaxes=False, vertical_spacing=0.1, 
                         subplot_titles=('Total Derivaciones por Intendencia', 'Total Cancelados por Intendencia'))
 
     # Subplot 1: Total Derivaciones
     fig.add_trace(go.Bar(x=df_agg['INTENDENCIA'], y=df_agg['total_deriv'], name='Derivaciones', marker_color='#2196F3',
                          text=df_agg['total_deriv'].apply(lambda x: f'{x:,.0f}'), textposition='outside',
-                         hovertemplate="%{x}<extra></extra>"), row=1, col=1)
+                         hovertemplate="<b>%{x}</b><extra></extra>"), row=1, col=1)
     fig.update_yaxes(title_text="", showticklabels=False, row=1, col=1)
     fig.update_xaxes(showticklabels=False, row=1, col=1) # Eliminar eje x
 
@@ -74,10 +74,10 @@ def crear_grafico_derivaciones_eficiencia(df_anio):
 
     fig.add_trace(go.Bar(x=df_agg['INTENDENCIA'], y=df_agg['total_cobros'], name='Cancelados', marker_color='#FF5722',
                          text=df_agg['total_cobros'].apply(lambda x: f'<b>{x:,.0f}</b>'), textposition=textpositions, textangle=0, insidetextanchor='middle',
-                         customdata=df_agg['eficiencia_promedio'], hovertemplate="<b>%{x}</b><br>Eficiencia: %{customdata:.1f}<extra></extra>"), row=2, col=1)
+                         customdata=df_agg['eficiencia_promedio'], hovertemplate="Eficiencia:<br><b>%{customdata:.1f}</b><extra></extra>"), row=2, col=1)
 
     fig.update_yaxes(title_text="", showticklabels=False, row=2, col=1)
-    fig.update_xaxes(tickangle=45, showticklabels=True, row=2, col=1) # Mostrar eje x
+    fig.update_xaxes(tickangle=0, showticklabels=True, row=2, col=1, tickfont=dict(size=11), automargin=False, title_standoff=45, ticklen=10, ticks="outside") # Mostrar eje x
 
     fig.update_layout(paper_bgcolor="#2c2c2c", plot_bgcolor="#2c2c2c", font_color="white", height=800, showlegend=False, margin=dict(t=100))
     fig.update_yaxes(showgrid=False)
@@ -131,7 +131,8 @@ radio_item_selected_style = {
 # =============================================
 def get_layout():
     layout = html.Div(
-        style={"backgroundColor": "#2c2c2c", "color": "white", "padding": "20px", "fontFamily": "Arial, sans-serif"},
+        className='dashboard-content',
+        style={"backgroundColor": "#2c2c2c", "color": "white", "padding": "15px", "fontFamily": "Arial, sans-serif"},
         children=[
             dcc.Store(id='store-selected-year-derivaciones', data=anios_filtrables[0] if anios_filtrables else None),
             html.Div(
@@ -162,7 +163,7 @@ def get_layout():
                                 ],
                                 value='TODAS',
                                 clearable=False,
-                                style={'color': '#000', 'backgroundColor': 'white', 'minWidth': '200px', 'flex': '1'}
+                                style={'color': '#000', 'backgroundColor': '#ADD8E6', 'minWidth': '200px', 'flex': '1'}
                             )
                         ]
                     )
