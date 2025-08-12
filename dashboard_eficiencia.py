@@ -137,10 +137,11 @@ card_style = {
 # =============================================
 def get_layout():
     layout = html.Div(
+        className='dashboard-content',
         style={
             "backgroundColor": "#2c2c2c", 
             "color": "white", 
-            "padding": "20px", 
+            "padding": "15px", 
             "fontFamily": "Arial, sans-serif",
             "minHeight": "100vh"
         },
@@ -151,7 +152,7 @@ def get_layout():
                     "padding": "20px", 
                     "borderRadius": "10px",
                     "marginBottom": "25px",
-                    "boxShadow": "0 4px 6px rgba(0, 0, 0, 0.3)"
+                    "boxShadow": "0 4px 6px rgba(0, 0, 0, 0.2)"
                 },
                 children=[
                     html.Div(
@@ -170,9 +171,10 @@ def get_layout():
                                 options=[{"label": str(a), "value": a} for a in anios_filtrables],
                                 multi=True,
                                 value=anios_filtrables,
+                                className='custom-dropdown-eficiencia',
                                 style={
                                     "color": "#000", 
-                                    "backgroundColor": "white",
+                                    "backgroundColor": "#ADD8E6",
                                     "minWidth": "300px",
                                     "flex": "1"
                                 }
@@ -193,7 +195,7 @@ def get_layout():
                 children=[
                     html.Div(style=card_style, children=[
                         html.H4(f"{linea_base_global:.1f}%", id="linea-base-general", style={"margin": "0", "fontSize": "36px", "color": "#00FFFF"}),
-                        html.P("Linea Base (Prom. 2020-2024)", style={"margin": "5px 0 0 0", "fontSize": "14px"})
+                        html.P("Linea Base | 2020-2024", style={"margin": "5px 0 0 0", "fontSize": "14px"})
                     ]),
                     html.Div(style=card_style, children=[
                         html.H4(id="anios-datos", style={"margin": "0", "fontSize": "36px", "color": "#E2EEF9"}),
@@ -209,7 +211,7 @@ def get_layout():
             html.Div(id="error-panel", style={"display": "none"}),
             
             dcc.Graph(id="heatmap-arriba"),
-            dcc.Graph(id="heatmap-abajo")
+            dcc.Graph(id="heatmap-abajo", style={'marginTop': '-30px'})
         ]
     )
     return layout

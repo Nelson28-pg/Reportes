@@ -12,20 +12,20 @@ app.title = "Dashboard Principal"
 server = app.server
 
 # Define el layout principal con pestañas
-app.layout = html.Div(style={'backgroundColor': '#2c2c2c'}, children=[
-    html.H1('Panel Principal de Cobranza No Coactiva | AEI. 02.03', style={'textAlign': 'center', 'color': '#FFFFFF', 'backgroundColor': '#1a1a1a', 'padding': '20px', 'marginBottom': 0}),
+app.layout = html.Div(style={'backgroundColor': '#2c2c2c', 'margin': '0px', 'padding': '0px', 'height': '100vh'}, children=[
+        html.H1('Panel de Cobranza No Coactiva', style={"fontFamily": "'Roboto', serif", 'textAlign': 'center', 'color': '#FFFFFF', 'backgroundColor': '#1a1a1a', 'padding': '25px', 'marginBottom': 0, 'marginTop': '0px'}),
     dcc.Tabs(id="tabs-principal", value='tab-derivaciones', children=[
         dcc.Tab(
-            label='Análisis de Derivaciones',
+            label=' | EEM Derivados y Cancelados |',
             value='tab-derivaciones',
-            style={'color': 'white', 'backgroundColor': '#333333', 'padding': '10px 6px', 'border': '1px solid #2c2c2c'},
-            selected_style={'color': '#FFFFFF', 'backgroundColor': '#1a1a1a', 'padding': '10px 6px', 'fontWeight': 'bold', 'border': '1px solid #00FFFF'}
+            style={'color': 'white', 'backgroundColor': '#2c2c2c', 'padding': '10px 6px', 'border': '1px solid #2c2c2c', 'borderRadius': '1px'},
+            selected_style={'color': '#FFFFFF', 'backgroundColor': '#1a1a1a', 'padding': '10px 6px', 'fontWeight': 'bold', 'border': '1px solid #00FFFF', 'borderRadius': '18px'}
         ),
         dcc.Tab(
-            label='Análisis de Eficiencia',
+            label='| Eficiencia de Cobranza |',
             value='tab-eficiencia',
-            style={'color': 'white', 'backgroundColor': '#333333', 'padding': '10px 6px', 'border': '1px solid #2c2c2c'},
-            selected_style={'color': 'FFFFFF', 'backgroundColor': '#1a1a1a', 'padding': '10px 6px', 'fontWeight': 'bold', 'border': '1px solid #00FFFF'}
+            style={'color': 'white', 'backgroundColor': '#2c2c2c', 'padding': '10px 6px', 'border': '1px solid #2c2c2c', 'borderRadius': '1px'},
+            selected_style={'color': 'FFFFFF', 'backgroundColor': '#1a1a1a', 'padding': '10px 6px', 'fontWeight': 'bold', 'border': '1px solid #00FFFF', 'borderRadius': '18px'}
         ),
     ]),
     html.Div(id='contenido-tab', style={'backgroundColor': '#2c2c2c'})
