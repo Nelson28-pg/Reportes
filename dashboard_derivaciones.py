@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 from dash import dcc, html, Input, Output, State, ALL, callback_context
 import os
 import json
@@ -35,57 +34,69 @@ def cargar_y_procesar_datos(ruta_csv):
     return df, df_historico, df_2025, anios_filtrables
 
 # =============================================
-# FUNCIÓN PARA CREAR GRÁFICO DE DERIVACIONES Y EFICIENCIA
+# FUNCIONES PARA CREAR GRÁFICOS
 # =============================================
-def crear_grafico_derivaciones_eficiencia(df_anio):
-    if 'DENOMINADOR' not in df_anio.columns or 'NUMERADOR' not in df_anio.columns or 'EFICIENCIA' not in df_anio.columns:
-        return go.Figure().update_layout(title='Columnas necesarias no encontradas', paper_bgcolor="#2c2c2c", plot_bgcolor="#2c2c2c", font_color="white"), 0, 0, 0
+def crear_grafico_derivaciones(df_agg, df_comparacion_agg, df_2025_agg, anio_sel, nombre_anio_comparacion):
+    fig = go.Figure()
+    # --- LÍNEAS DEL AÑO SELECCIONADO ---
+    fig.add_trace(go.Scatter(x=df_agg['INTENDENCIA'], y=df_agg['total_deriv'],
+                             mode='lines', name=f'Derivaciones {anio_sel}',
+                             line=dict(color='#FFA500', width=3),
+                             hovertemplate="%{y:,.0f}"))
+    # --- LÍNEAS DEL AÑO DE COMPARACIÓN ---
+    fig.add_trace(go.Scatter(x=df_comparacion_agg['INTENDENCIA'], y=df_comparacion_agg['total_deriv_comp'],
+                             mode='lines', name=f'Derivaciones {nombre_anio_comparacion}',
+                             line=dict(color='#D3D3D3', width=1.5),
+                             hovertemplate="%{y:,.0f}"))
+    # --- LÍNEAS DE 2025 ---
+    fig.add_trace(go.Scatter(x=df_2025_agg['INTENDENCIA'], y=df_2025_agg['total_deriv_2025'],
+                             mode='lines', name='Derivaciones 2025',
+                             line=dict(color='#00FFFF', width=3), visible='legendonly',
+                             hovertemplate="%{y:,.0f}"))
+    
+    fig.update_layout(
+        title='Total Derivaciones por Intendencia',
+        paper_bgcolor="#2c2c2c",
+        plot_bgcolor="#2c2c2c",
+        font_color="white",
+        height=400,
+        showlegend=True,
+        margin=dict(t=50, b=50, l=50, r=50)
+    )
+    fig.update_yaxes(showgrid=False, showticklabels=False, title_text="")
+    fig.update_xaxes(showgrid=False)
+    return fig
 
-    # Suma total de derivaciones y cobros para el año seleccionado
-    total_derivaciones_anio = df_anio['DENOMINADOR'].sum()
-    total_cobros_anio = df_anio['NUMERADOR'].sum()
+def crear_grafico_cancelados(df_agg, df_comparacion_agg, df_2025_agg, anio_sel, nombre_anio_comparacion):
+    fig = go.Figure()
+    # --- LÍNEAS DEL AÑO SELECCIONADO ---
+    fig.add_trace(go.Scatter(x=df_agg['INTENDENCIA'], y=df_agg['total_cobros'],
+                             mode='lines', name=f'Cancelados {anio_sel}',
+                             line=dict(color='#FFA500', width=3),
+                             hovertemplate="%{y:,.0f}"))
+    # --- LÍNEAS DEL AÑO DE COMPARACIÓN ---
+    fig.add_trace(go.Scatter(x=df_comparacion_agg['INTENDENCIA'], y=df_comparacion_agg['total_cobros_comp'],
+                             mode='lines', name=f'Cancelados {nombre_anio_comparacion}',
+                             line=dict(color='#D3D3D3', width=1.5),
+                             hovertemplate="%{y:,.0f}"))
+    # --- LÍNEAS DE 2025 ---
+    fig.add_trace(go.Scatter(x=df_2025_agg['INTENDENCIA'], y=df_2025_agg['total_cobros_2025'],
+                             mode='lines', name='Cancelados 2025',
+                             line=dict(color='#00FFFF', width=3), visible='legendonly',
+                             hovertemplate="%{y:,.0f}"))
 
-    # Agrupar por intendencia y sumar derivaciones, cobros y calcular eficiencia promedio
-    df_agg = df_anio.groupby('INTENDENCIA').agg(
-        total_deriv=('DENOMINADOR', 'sum'),
-        total_cobros=('NUMERADOR', 'sum'),
-        eficiencia_promedio=('EFICIENCIA', 'mean')
-    ).reset_index()
-
-    # Ordenar por total_derivaciones de forma ascendente
-    df_agg = df_agg.sort_values('total_deriv', ascending=True)
-
-    # Calcular promedio de eficiencia para el año
-    promedio_eficiencia_anio = df_agg['eficiencia_promedio'].mean()
-
-    fig = make_subplots(rows=2, cols=1, shared_xaxes=False, vertical_spacing=0.1, 
-                        subplot_titles=('Total Derivaciones por Intendencia', 'Total Cancelados por Intendencia'))
-
-    # Subplot 1: Total Derivaciones
-    fig.add_trace(go.Bar(x=df_agg['INTENDENCIA'], y=df_agg['total_deriv'], name='Derivaciones', marker_color='#2196F3',
-                         text=df_agg['total_deriv'].apply(lambda x: f'{x:,.0f}'), textposition='outside',
-                         hovertemplate="<b>%{x}</b><extra></extra>"), row=1, col=1)
-    fig.update_yaxes(title_text="", showticklabels=False, row=1, col=1)
-    fig.update_xaxes(showticklabels=False, row=1, col=1) # Eliminar eje x
-
-    # Subplot 2: Total Cancelados por Intendencia
-    max_value = df_agg['total_cobros'].max()
-    textpositions = ['outside' if v < 0.1 * max_value else 'inside' for v in df_agg['total_cobros']]
-
-    fig.add_trace(go.Bar(x=df_agg['INTENDENCIA'], y=df_agg['total_cobros'], name='Cancelados', marker_color='#FF5722',
-                         text=df_agg['total_cobros'].apply(lambda x: f'<b>{x:,.0f}</b>'), textposition=textpositions, textangle=0, insidetextanchor='middle',
-                         customdata=df_agg['eficiencia_promedio'], hovertemplate="Eficiencia:<br><b>%{customdata:.1f}</b><extra></extra>"), row=2, col=1)
-
-    fig.update_yaxes(title_text="", showticklabels=False, row=2, col=1)
-    fig.update_xaxes(tickangle=0, showticklabels=True, row=2, col=1, tickfont=dict(size=11), automargin=False, title_standoff=45, ticklen=10, ticks="outside") # Mostrar eje x
-
-    fig.update_layout(paper_bgcolor="#2c2c2c", plot_bgcolor="#2c2c2c", font_color="white", height=800, showlegend=False, margin=dict(t=100))
-    fig.update_yaxes(showgrid=False)
-
-    # Actualizar anotaciones de subtítulos
-    fig.update_annotations(x=0, xanchor='left', font=dict(size=16, color='white', family='Arial, sans-serif', weight='bold'))
-
-    return fig, total_derivaciones_anio, total_cobros_anio, promedio_eficiencia_anio
+    fig.update_layout(
+        title='Total Cancelados por Intendencia',
+        paper_bgcolor="#2c2c2c",
+        plot_bgcolor="#2c2c2c",
+        font_color="white",
+        height=400,
+        showlegend=True,
+        margin=dict(t=50, b=50, l=50, r=50)
+    )
+    fig.update_yaxes(showgrid=False, showticklabels=False, title_text="")
+    fig.update_xaxes(showgrid=False, tickangle=0, showticklabels=True, tickfont=dict(size=11), tickcolor='#2c2c2c', automargin=False, title_standoff=45, ticklen=10, ticks="outside")
+    return fig
 
 # =============================================
 # CARGAR DATOS INICIALES
@@ -172,7 +183,8 @@ def get_layout():
 
             html.Div(style={"padding": "5px 20px"}, children=[
                 html.Div(id='stats-panel-derivaciones', style={"display": "flex", "justifyContent": "center", "alignItems": "stretch", "margin": "5px 0"}),
-                dcc.Graph(id='grafico-derivaciones')
+                dcc.Graph(id='grafico-derivaciones'),
+                dcc.Graph(id='grafico-cancelados')
             ])
         ]
     )
@@ -211,43 +223,82 @@ def register_callbacks(app):
         return styles
 
     @app.callback(
-        [Output("grafico-derivaciones", "figure"), Output('stats-panel-derivaciones', 'children')],
+        [Output("grafico-derivaciones", "figure"),
+         Output("grafico-cancelados", "figure"),
+         Output('stats-panel-derivaciones', 'children')],
         [Input("store-selected-year-derivaciones", "data"),
          Input("filtro-intendencia-grupo", "value")]
     )
     def actualizar_analisis_derivaciones(anio_sel, intendencia_grupo_sel):
         fig_empty = go.Figure().update_layout(paper_bgcolor="#2c2c2c", plot_bgcolor="#2c2c2c", font_color="white")
-        fig = fig_empty
-
+        
         if not anio_sel:
-            return fig, []
+            return fig_empty, fig_empty, []
 
+        # Filtrar datos para el año seleccionado
         df_filtered_by_year = df_full[df_full["ANIO"] == anio_sel].copy()
 
-        if intendencia_grupo_sel == 'ILM':
-            df_filt = df_filtered_by_year[df_filtered_by_year['INTENDENCIA'] == 'ILM'].copy()
-        elif intendencia_grupo_sel == 'REGIONALES':
+        # Determinar el año de comparación
+        if anio_sel == anios_filtrables[0]:
+            anio_comparacion = df_full['ANIO'].max()
+            nombre_anio_comparacion = f'Actual ({anio_comparacion})'
+        else:
+            anio_comparacion = anio_sel - 1
+            nombre_anio_comparacion = f'Anterior ({anio_comparacion})'
+
+        df_comparacion_raw = df_full[df_full["ANIO"] == anio_comparacion].copy()
+
+        # Aplicar filtro de intendencia
+        if intendencia_grupo_sel == 'REGIONALES':
             df_filt = df_filtered_by_year[df_filtered_by_year['INTENDENCIA'] != 'ILM'].copy()
+            df_comparacion_filt = df_comparacion_raw[df_comparacion_raw['INTENDENCIA'] != 'ILM'].copy()
         else: # 'TODAS'
             df_filt = df_filtered_by_year.copy()
+            df_comparacion_filt = df_comparacion_raw.copy()
 
         if df_filt.empty:
-            return fig, []
+            return fig_empty, fig_empty, []
 
-        fig, total_deriv, total_cobro, prom_eficiencia = crear_grafico_derivaciones_eficiencia(df_filt)
+        # Procesamiento de datos
+        df_agg = df_filt.groupby('INTENDENCIA').agg(
+            total_deriv=('DENOMINADOR', 'sum'),
+            total_cobros=('NUMERADOR', 'sum')
+        ).reset_index().sort_values('total_deriv', ascending=True)
+
+        df_comparacion_agg = df_comparacion_filt.groupby('INTENDENCIA').agg(
+            total_deriv_comp=('DENOMINADOR', 'sum'),
+            total_cobros_comp=('NUMERADOR', 'sum')
+        ).reset_index()
+        df_comparacion_agg = pd.merge(df_agg[['INTENDENCIA']], df_comparacion_agg, on='INTENDENCIA', how='left').fillna(0)
+
+        df_2025_agg = df_2025.groupby('INTENDENCIA').agg(
+            total_deriv_2025=('DENOMINADOR', 'sum'),
+            total_cobros_2025=('NUMERADOR', 'sum')
+        ).reset_index()
+        df_2025_agg = pd.merge(df_agg[['INTENDENCIA']], df_2025_agg, on='INTENDENCIA', how='left').fillna(0)
+
+        # Crear figuras
+        fig_derivaciones = crear_grafico_derivaciones(df_agg, df_comparacion_agg, df_2025_agg, anio_sel, nombre_anio_comparacion)
+        fig_cancelados = crear_grafico_cancelados(df_agg, df_comparacion_agg, df_2025_agg, anio_sel, nombre_anio_comparacion)
+
+        # Calcular estadísticas
+        total_deriv = df_filt['DENOMINADOR'].sum()
+        total_cobro = df_filt['NUMERADOR'].sum()
+        prom_eficiencia = (total_cobro / total_deriv * 100) if total_deriv > 0 else 0
 
         stats_cards = [
             html.Div(style=card_style, children=[
                 html.H4(f"{total_deriv:,.0f}", style={"margin": "0", "fontSize": "36px", "color": "#00FFFF"}),
-                html.P(f"Total Derivaciones ({anio_sel})", style={"margin": "5px 0 0 0", "fontSize": "14px"})
+                html.P(f"Total Derivaciones", style={"margin": "5px 0 0 0", "fontSize": "14px"})
             ]),
             html.Div(style=card_style, children=[
                 html.H4(f"{total_cobro:,.0f}", style={"margin": "0", "fontSize": "36px", "color": "#FEF7F5"}),
-                html.P(f"Total Cobros ({anio_sel})", style={"margin": "5px 0 0 0", "fontSize": "14px"})
+                html.P(f"Total Cancelados", style={"margin": "5px 0 0 0", "fontSize": "14px"})
             ]),
             html.Div(style=card_style, children=[
                 html.H4(f"{prom_eficiencia:.1f}%", style={"margin": "0", "fontSize": "36px", "color": "#00FFFF"}),
-                html.P(f"Promedio Eficiencia ({anio_sel})", style={"margin": "5px 0 0 0", "fontSize": "14px"})
+                html.P(f"Promedio Eficiencia", style={"margin": "5px 0 0 0", "fontSize": "14px"})
             ])
         ]
-        return fig, stats_cards
+        
+        return fig_derivaciones, fig_cancelados, stats_cards
