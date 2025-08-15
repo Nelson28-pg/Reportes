@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barras con Etiquetas Grandes</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            margin: 0;
+            padding: 20px;
+            color: white;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #00f5ff, #ff6b9d);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+        }
+
+        .chart-container {
+            margin: 30px 0;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .chart-title {
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #00f5ff;
+            text-shadow: 0 0 10px rgba(0, 245, 255, 0.5);
+        }
+
+        /* Método 1: Etiquetas externas */
+        .chart-method1 {
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .bar-item {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            position: relative;
+        }
+
+        .bar-label {
+            width: 200px;
+            font-size: 18px;
+            font-weight: 600;
+            margin-right: 20px;
+            text-align: right;
+            color: white;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+        }
+
+        .bar-wrapper {
+            flex: 1;
+            position: relative;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .bar {
+            height: 100%;
+            border-radius: 20px;
+            position: relative;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .bar1 { 
+            width: 60.9%; 
+            background: linear-gradient(45deg, #00f5ff, #0099cc);
+            animation: slideIn1 1s ease-out;
+        }
+        .bar2 { 
+            width: 30.4%; 
+            background: linear-gradient(45deg, #ff6b9d, #ff8c42);
+            animation: slideIn2 1.2s ease-out;
+        }
+        .bar3 { 
+            width: 8.7%; 
+            background: linear-gradient(45deg, #ffd93d, #ff6b35);
+            animation: slideIn3 1.4s ease-out;
+        }
+
+        .bar-value {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+            z-index: 2;
+        }
+
+        /* Método 2: Etiquetas superpuestas grandes */
+        .chart-method2 .bar-item {
+            position: relative;
+            margin: 20px 0;
+        }
+
+        .chart-method2 .bar-wrapper {
+            height: 50px;
+            margin: 10px 0;
+        }
+
+        .chart-method2 .bar-label {
+            position: absolute;
+            left: 0;
+            top: -25px;
+            width: 100%;
+            text-align: left;
+            font-size: 20px;
+            font-weight: 700;
+            z-index: 10;
+            margin: 0;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .chart-method2 .bar-value {
+            position: absolute;
+            right: 10px;
+            top: -25px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #00f5ff;
+            text-shadow: 0 0 10px rgba(0, 245, 255, 0.8);
+        }
+
+        /* Método 3: Diseño en columnas */
+        .chart-method3 {
+            display: grid;
+            grid-template-columns: 250px 1fr 80px;
+            gap: 20px;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        .chart-method3 .labels-column,
+        .chart-method3 .values-column {
+            display: flex;
+            flex-direction: column;
+            gap: 35px;
+        }
+
+        .chart-method3 .bars-column {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .chart-method3 .bar-label {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0;
+            width: auto;
+            text-align: left;
+            color: white;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+        }
+
+        .chart-method3 .bar-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #00f5ff;
+            text-shadow: 0 0 10px rgba(0, 245, 255, 0.8);
+            position: static;
+            transform: none;
+        }
+
+        .chart-method3 .bar-wrapper {
+            height: 35px;
+            margin: 0;
+        }
+
+        /* Animaciones */
+        @keyframes slideIn1 {
+            from { width: 0; }
+            to { width: 60.9%; }
+        }
+
+        @keyframes slideIn2 {
+            from { width: 0; }
+            to { width: 30.4%; }
+        }
+
+        @keyframes slideIn3 {
+            from { width: 0; }
+            to { width: 8.7%; }
+        }
+
+        /* Hover effects */
+        .bar:hover {
+            transform: scaleY(1.1);
+            filter: brightness(1.2);
+        }
+
+        .bar-item:hover .bar-label {
+            color: #00f5ff;
+            transform: scale(1.05);
+        }
+
+        .bar-item:hover .bar-value {
+            color: #ffd93d;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .chart-method3 {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .chart-method3 .labels-column,
+            .chart-method3 .values-column {
+                order: -1;
+            }
+            
+            .bar-label {
+                font-size: 16px !important;
+            }
+        }
+
+        .method-selector {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .method-btn {
+            background: linear-gradient(45deg, #00f5ff, #0099cc);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            margin: 0 10px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 245, 255, 0.3);
+        }
+
+        .method-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 245, 255, 0.5);
+        }
+
+        .method-btn.active {
+            background: linear-gradient(45deg, #ff6b9d, #ff8c42);
+        }
+
+        .chart-container {
+            display: none;
+        }
+
+        .chart-container.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Etiquetas Grandes en Gráficos de Barras</h1>
+        
+        <div class="method-selector">
+            <button class="method-btn active" onclick="showMethod(1)">Método 1: Etiquetas Externas</button>
+            <button class="method-btn" onclick="showMethod(2)">Método 2: Etiquetas Superpuestas</button>
+            <button class="method-btn" onclick="showMethod(3)">Método 3: Columnas Separadas</button>
+        </div>
+
+        <!-- Método 1: Etiquetas externas -->
+        <div class="chart-container active" id="method1">
+            <div class="chart-title">Método 1: Etiquetas a la Izquierda</div>
+            <div class="chart-method1">
+                <div class="bar-item">
+                    <div class="bar-label">No, rara vez</div>
+                    <div class="bar-wrapper">
+                        <div class="bar bar1">
+                            <div class="bar-value">60.9%</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bar-item">
+                    <div class="bar-label">No, nunca</div>
+                    <div class="bar-wrapper">
+                        <div class="bar bar2">
+                            <div class="bar-value">30.4%</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bar-item">
+                    <div class="bar-label">Sí, ocasionalmente</div>
+                    <div class="bar-wrapper">
+                        <div class="bar bar3">
+                            <div class="bar-value">8.7%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Método 2: Etiquetas superpuestas -->
+        <div class="chart-container" id="method2">
+            <div class="chart-title">Método 2: Etiquetas Superpuestas</div>
+            <div class="chart-method2">
+                <div class="bar-item">
+                    <div class="bar-label">No, rara vez</div>
+                    <div class="bar-value">60.9%</div>
+                    <div class="bar-wrapper">
+                        <div class="bar bar1"></div>
+                    </div>
+                </div>
+                <div class="bar-item">
+                    <div class="bar-label">No, nunca</div>
+                    <div class="bar-value">30.4%</div>
+                    <div class="bar-wrapper">
+                        <div class="bar bar2"></div>
+                    </div>
+                </div>
+                <div class="bar-item">
+                    <div class="bar-label">Sí, ocasionalmente</div>
+                    <div class="bar-value">8.7%</div>
+                    <div class="bar-wrapper">
+                        <div class="bar bar3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Método 3: Columnas separadas -->
+        <div class="chart-container" id="method3">
+            <div class="chart-title">Método 3: Diseño en Columnas</div>
+            <div class="chart-method3">
+                <div class="labels-column">
+                    <div class="bar-label">No, rara vez</div>
+                    <div class="bar-label">No, nunca</div>
+                    <div class="bar-label">Sí, ocasionalmente</div>
+                </div>
+                <div class="bars-column">
+                    <div class="bar-wrapper">
+                        <div class="bar bar1"></div>
+                    </div>
+                    <div class="bar-wrapper">
+                        <div class="bar bar2"></div>
+                    </div>
+                    <div class="bar-wrapper">
+                        <div class="bar bar3"></div>
+                    </div>
+                </div>
+                <div class="values-column">
+                    <div class="bar-value">60.9%</div>
+                    <div class="bar-value">30.4%</div>
+                    <div class="bar-value">8.7%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showMethod(methodNumber) {
+            // Ocultar todos los métodos
+            document.querySelectorAll('.chart-container').forEach(container => {
+                container.classList.remove('active');
+            });
+            
+            // Desactivar todos los botones
+            document.querySelectorAll('.method-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Mostrar el método seleccionado
+            document.getElementById(`method${methodNumber}`).classList.add('active');
+            
+            // Activar el botón correspondiente
+            event.target.classList.add('active');
+        }
+
+        // Agregar efectos de hover dinámicos
+        document.addEventListener('DOMContentLoaded', function() {
+            const barItems = document.querySelectorAll('.bar-item');
+            
+            barItems.forEach(item => {
+                item.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.02)';
+                    this.style.transition = 'transform 0.3s ease';
+                });
+                
+                item.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

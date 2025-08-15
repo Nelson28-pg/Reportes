@@ -75,7 +75,7 @@ def crear_heatmap(df_grupo, df_2025_grupo, titulo, color_scale_2025, color_scale
         x=['Prom. Años Anteriores'], y=df_final.index,
         colorscale=color_scale_prom, showscale=False,
         text=df_final[['Prom. Años Anteriores']].applymap(lambda x: f'<b>{x:.1f}</b>'),
-        texttemplate="%{text}", textfont=dict(size=9, color="white"),
+        texttemplate="%{text}", textfont=dict(size=11, color="white"),
         hovertemplate="%{z:.1f}<extra></extra>",
         xgap=1.8, ygap=1.8
     ), row=1, col=2)
@@ -85,7 +85,7 @@ def crear_heatmap(df_grupo, df_2025_grupo, titulo, color_scale_2025, color_scale
         x=['2025'], y=df_final.index,
         colorscale=color_scale_2025, showscale=False,
         text=df_final[[2025]].applymap(lambda x: f'<b>{x:.1f}</b>'),
-        texttemplate="%{text}", textfont=dict(size=11, color="white"),
+        texttemplate="%{text}", textfont=dict(size=12, color="white"),
         hovertemplate="%{z:.1f}<extra></extra>",
         xgap=1.8, ygap=1.8
     ), row=1, col=3)
@@ -259,7 +259,7 @@ def register_callbacks(app):
             color_verde_medio = [[0, "#66CDAA"], [1, "#2E8B57"]]
             color_verde_suave = [[0, "#98FB98"], [1, "#558255"]]
 
-            color_rojo_intenso = [[0, "#F44336"], [1, "#4d1a1a"]]
+            color_rojo_intenso = [[0, "#4d1a1a"], [1, "#F44336"]]
             color_rojo_medio = [[0, "#E9967A"], [1, "#8A3232"]]
             color_rojo_suave = [[0, "#E9967A"], [1, "#9F3E3E"]]
 

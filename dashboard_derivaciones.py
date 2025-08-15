@@ -29,9 +29,8 @@ def leer_archivo(ruta_csv):
 def cargar_y_procesar_datos(ruta_csv):
     df = leer_archivo(ruta_csv)
     df_2025 = df[df['ANIO'] == 2025].copy()
-    df_historico = df[df['ANIO'] < 2025].copy()
-    anios_filtrables = sorted(df_historico["ANIO"].unique())
-    return df, df_historico, df_2025, anios_filtrables
+    anios_filtrables = sorted(df["ANIO"].unique())
+    return df, df_2025, anios_filtrables
 
 # =============================================
 # FUNCIONES PARA CREAR GRÁFICOS
@@ -41,17 +40,17 @@ def crear_grafico_derivaciones(df_agg, df_comparacion_agg, df_2025_agg, anio_sel
     # --- LÍNEAS DEL AÑO SELECCIONADO ---
     fig.add_trace(go.Scatter(x=df_agg['INTENDENCIA'], y=df_agg['total_deriv'],
                              mode='lines', name=f'Derivaciones {anio_sel}',
-                             line=dict(color='#FFA500', width=3),
+                             line=dict(color='#00FFFF', width=3),
                              hovertemplate="%{y:,.0f}"))
     # --- LÍNEAS DEL AÑO DE COMPARACIÓN ---
     fig.add_trace(go.Scatter(x=df_comparacion_agg['INTENDENCIA'], y=df_comparacion_agg['total_deriv_comp'],
                              mode='lines', name=f'Derivaciones {nombre_anio_comparacion}',
-                             line=dict(color='#D3D3D3', width=1.5),
+                             line=dict(color="#B1B1B1", width=1.1),
                              hovertemplate="%{y:,.0f}"))
     # --- LÍNEAS DE 2025 ---
     fig.add_trace(go.Scatter(x=df_2025_agg['INTENDENCIA'], y=df_2025_agg['total_deriv_2025'],
                              mode='lines', name='Derivaciones 2025',
-                             line=dict(color='#00FFFF', width=3), visible='legendonly',
+                             line=dict(color='#FFA500', width=3), visible='legendonly',
                              hovertemplate="%{y:,.0f}"))
     
     fig.update_layout(
@@ -64,7 +63,7 @@ def crear_grafico_derivaciones(df_agg, df_comparacion_agg, df_2025_agg, anio_sel
         margin=dict(t=50, b=50, l=50, r=50)
     )
     fig.update_yaxes(showgrid=False, showticklabels=False, title_text="")
-    fig.update_xaxes(showgrid=False)
+    fig.update_xaxes(showgrid=False, tickfont=dict(size=11))
     return fig
 
 def crear_grafico_cancelados(df_agg, df_comparacion_agg, df_2025_agg, anio_sel, nombre_anio_comparacion):
@@ -72,17 +71,17 @@ def crear_grafico_cancelados(df_agg, df_comparacion_agg, df_2025_agg, anio_sel, 
     # --- LÍNEAS DEL AÑO SELECCIONADO ---
     fig.add_trace(go.Scatter(x=df_agg['INTENDENCIA'], y=df_agg['total_cobros'],
                              mode='lines', name=f'Cancelados {anio_sel}',
-                             line=dict(color='#FFA500', width=3),
+                             line=dict(color='#00FFFF', width=3),
                              hovertemplate="%{y:,.0f}"))
     # --- LÍNEAS DEL AÑO DE COMPARACIÓN ---
     fig.add_trace(go.Scatter(x=df_comparacion_agg['INTENDENCIA'], y=df_comparacion_agg['total_cobros_comp'],
                              mode='lines', name=f'Cancelados {nombre_anio_comparacion}',
-                             line=dict(color='#D3D3D3', width=1.5),
+                             line=dict(color='#B1B1B1', width=1.1),
                              hovertemplate="%{y:,.0f}"))
     # --- LÍNEAS DE 2025 ---
     fig.add_trace(go.Scatter(x=df_2025_agg['INTENDENCIA'], y=df_2025_agg['total_cobros_2025'],
                              mode='lines', name='Cancelados 2025',
-                             line=dict(color='#00FFFF', width=3), visible='legendonly',
+                             line=dict(color='#FFA500', width=3), visible='legendonly',
                              hovertemplate="%{y:,.0f}"))
 
     fig.update_layout(
@@ -104,11 +103,11 @@ def crear_grafico_cancelados(df_agg, df_comparacion_agg, df_2025_agg, anio_sel, 
 try:
     script_dir = os.path.dirname(os.path.abspath(__file__))
     csv_path = os.path.join(script_dir, "Eficiencia_cobranzaNC_2020-2025.csv")
-    df_full, df_historico, df_2025, anios_filtrables = cargar_y_procesar_datos(csv_path)
+    df_full, df_2025, anios_filtrables = cargar_y_procesar_datos(csv_path)
 
 except Exception as e:
     print(f"Error al cargar datos en dashboard_derivaciones: {e}")
-    df_full, df_historico, df_2025, anios_filtrables = pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), []
+    df_full, df_2025, anios_filtrables = pd.DataFrame(), pd.DataFrame(), []
 
 
 # =============================================
@@ -241,10 +240,10 @@ def register_callbacks(app):
         # Determinar el año de comparación
         if anio_sel == anios_filtrables[0]:
             anio_comparacion = df_full['ANIO'].max()
-            nombre_anio_comparacion = f'Actual ({anio_comparacion})'
+            nombre_anio_comparacion = f'{anio_comparacion}'
         else:
             anio_comparacion = anio_sel - 1
-            nombre_anio_comparacion = f'Anterior ({anio_comparacion})'
+            nombre_anio_comparacion = f'{anio_comparacion}'
 
         df_comparacion_raw = df_full[df_full["ANIO"] == anio_comparacion].copy()
 
