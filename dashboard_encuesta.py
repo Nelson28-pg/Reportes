@@ -155,14 +155,14 @@ def crear_grafico_barras_horizontales(df, columna):
     fig.update_layout(
         title=dict(
             text=f'<b>{columna}</b>',
-            x=0.11, #es el margen izquierdo del título
+            x=0.14, #es el margen izquierdo del título
             xanchor='left',
             font=dict(size=16, family='Arial, sans-serif')
         ),
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
         font=dict(color='white', family='Arial, sans-serif'),
-        margin=dict(l=70, r=40, t=60, b=40), # Aumentar margen derecho de los gráficos
+        margin=dict(l=90, r=30, t=60, b=40), # Aumentar margen derecho de los gráficos
         height=max(300, len(counts.index) * 50 + 60),
         xaxis=dict(
             showgrid=False,
