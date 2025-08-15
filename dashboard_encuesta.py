@@ -69,81 +69,115 @@ stat_card_style = {
 
 # --- Paletas de colores para los gráficos ---
 # Puede cambiar o agregar colores a estas listas.
-color_celeste = "#FFCC00" # Color para la barra más alta (respuesta más común)
+color_celeste = "#A98700" # Color para la barra más alta (respuesta más común)
 color_neutro = '#888888' # Color para las otras barras
-color_neutro2 = "#AAAAAA" # Color para las otras barras
+color_neutro2 = "#7D7D7D" # Color para las otras barras
 
 # =============================================
 # FUNCIÓN PARA CREAR GRÁFICO
 # =============================================
 def crear_grafico_barras_horizontales(df, columna):
-    # Contar la frecuencia de cada respuesta y ordenarlas de menor a mayor
+    # Contar la frecuencia de cada respuesta y ordenarlas de mayor a menor para el gráfico
     counts = df[columna].value_counts().sort_values(ascending=True)
 
     # Calcular porcentajes
     total_responses = counts.sum()
     percentages = (counts.values / total_responses * 100) if total_responses > 0 else [0] * len(counts)
 
-    # Asignar colores: uno especial para la barra más alta y otros para el resto
+    # Asignar colores: un color destacado para la barra más alta (la última, por el sort_values)
     colors = [color_neutro2] * (len(counts) - 1) + [color_celeste]
 
-    fig = go.Figure(data=[go.Bar(
-        y=counts.index,
-        x=counts.values,
-        orientation='h',
-        # Personalización de las barras
-        marker=dict(
-            color=colors, 
-            line=dict(color='#2c2c2c', width=0.2), # Borde de las barras
-            cornerradius=10 # Bordes de barra redondeados
-        ),
-        # El texto con el valor porcentual se posiciona fuera de la barra.
-        text=[f'{p:.1f}%' for p in percentages],
-        textposition='outside',
-        textfont=dict(color='white', size=12),
-        # Personalización del texto que aparece al pasar el cursor (hover)
-        hovertemplate='cant : <b>%{x}</b><extra></extra>'
-    )])
-    
-    # --- Personalización del Layout del Gráfico ---
-    height = max(250, len(counts.index) * 40 + 80) # Altura dinámica del gráfico
-    
-    # Se preparan las anotaciones para colocar la etiqueta de categoría encima de cada barra.
-    annotations = []
-    for i, label in enumerate(counts.index):
-        # El color de la anotación es blanco para todas las barras, excepto la más alta.
-        annotation_color = 'white' if i < len(counts) - 1 else colors[i]
-        annotations.append(
-            dict(
-                xref='x', yref='y',
-                x=0, y=label, # Posición al inicio de la barra
-                xanchor='left',
-                text= f'{str(label)}',
-                font=dict(family='Arial', size=15, color=annotation_color),
-                showarrow=False,
-                align='left',
-                yshift=24 # Se ajusta el desplazamiento para la nueva fuente
-            )
-        )
+    # Crear un DataFrame para facilitar el manejo en Plotly
+    df_grafico = pd.DataFrame({
+        'respuesta': counts.index,
+        'valores': counts.values,
+        'porcentaje': percentages,
+        'color': colors
+    })
 
+    fig = go.Figure()
+
+    # --- Lógica para texto y hover ---
+    text_values = []
+    hover_templates = []
+    for _, row in df_grafico.iterrows():
+        # Si la barra es muy corta (ej. < 15%), el texto del porcentaje solo se muestra en el hover.
+        if row['porcentaje'] < 21:
+            text_values.append('') # No mostrar texto en la barra
+            hover_templates.append(f"Porcentaje: {row['porcentaje']:.1f}%<br>Cantidad: <b>{row['valores']}</b><extra></extra>")
+        else:
+            text_values.append(f"{row['porcentaje']:.1f}%")
+            hover_templates.append(f"<br>Cantidad: <b>{row['valores']}</b><extra></extra>")
+
+    # Agregar barras horizontales
+    fig.add_trace(go.Bar(
+        y=df_grafico['respuesta'],
+        x=df_grafico['porcentaje'],
+        orientation='h',
+        marker=dict(
+            color=df_grafico['color'],
+            line=dict(width=0),
+            cornerradius=8
+        ),
+        text=text_values,
+        textposition='outside',
+        textfont=dict(
+            size=12,
+            color='white',
+            family='Arial, sans-serif'
+        ),
+        hovertemplate=hover_templates,
+        hoverlabel=dict(
+            bgcolor=color_celeste, # Color de fondo del hover
+            font=dict(color='black') # Color de la fuente del hover para contraste
+        ),
+        showlegend=False
+    ))
+
+    # --- Anotaciones para etiquetas de respuesta dentro de la barra ---
+    annotations = []
+    for i, row in df_grafico.iterrows():
+        # El color de la etiqueta debe contrastar con el fondo de la barra.
+        # Para los colores oscuros que usamos (celeste y gris), el blanco funciona bien.
+        label_color = 'white'
+
+        annotations.append(dict(
+            xref='x', yref='y',
+            x=2,  # Posicionar la etiqueta ligeramente a la derecha del inicio de la barra
+            y=row['respuesta'],
+            text=f"<b>{row['respuesta']}</b>",
+            font=dict(family='Arial, sans-serif', size=13, color=label_color),
+            showarrow=False,
+            xanchor='left',
+        ))
+
+    # Configurar layout moderno y limpio
     fig.update_layout(
-        # Para poner el título en negrita, usamos etiquetas HTML <b>
-        title_text=f'{columna}',
-        title_x=0.03, # Alinea el título a la izquierda
-        title_xanchor='left',
-        paper_bgcolor="rgba(0,0,0,0)", # Fondo del área del gráfico (transparente para ver el de la tarjeta)
-        plot_bgcolor="rgba(0,0,0,0)",  # Fondo del área de trazado (transparente)
-        font_color="white",
-        showlegend=False,
-        margin=dict(t=50, b=20, l=20, r=60), # Ajustar márgenes para las etiquetas
-        height=height,
-        # Se reduce el espacio entre barras para que estas sean más gruesas y modernas.
-        bargap=0.6,
+        title=dict(
+            text=f'<b>{columna}</b>',
+            x=0.11, #es el margen izquierdo del título
+            xanchor='left',
+            font=dict(size=16, family='Arial, sans-serif')
+        ),
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font=dict(color='white', family='Arial, sans-serif'),
+        margin=dict(l=70, r=40, t=60, b=40), # Aumentar margen derecho de los gráficos
+        height=max(300, len(counts.index) * 50 + 60),
+        xaxis=dict(
+            showgrid=False,
+            showticklabels=False,
+            zeroline=False,
+            range=[0, max(df_grafico['porcentaje']) * 1.40] # Aumentar espacio para texto fuera de la barra
+        ),
+        yaxis=dict(
+            showgrid=False,
+            showticklabels=False # Ocultar etiquetas del eje Y, ya que usamos anotaciones
+        ),
+        bargap=0.5, # Espacio entre barras
         annotations=annotations
     )
-    # Ocultar líneas y etiquetas de los ejes para un look más limpio
-    fig.update_xaxes(showgrid=False, showticklabels=False, zeroline=False)
-    fig.update_yaxes(showgrid=False, zeroline=False, showticklabels=False) # Se oculta el eje Y, ya que se usan anotaciones
+
     return fig
 
 # =============================================

@@ -1,0 +1,330 @@
+import plotly.graph_objects as go
+import plotly.express as px
+from plotly.subplots import make_subplots
+import pandas as pd
+
+# =============================================
+# DATOS DE EJEMPLO - Reemplaza con tus datos
+# =============================================
+data = {
+    'respuesta': ['No, rara vez', 'No, nunca', 'Sí, ocasionalmente'],
+    'porcentaje': [60.9, 30.4, 8.7],
+    'color': ['#00f5ff', '#ff6b9d', '#ffd93d']
+}
+df = pd.DataFrame(data)
+
+# =============================================
+# FUNCIÓN PARA CREAR GRÁFICO MÉTODO 1
+# Barras horizontales con etiquetas grandes
+# =============================================
+def crear_grafico_metodo1(df, titulo="Distribución de Respuestas"):
+    """
+    Crea gráfico de barras horizontales con etiquetas grandes a la izquierda
+    """
+    fig = go.Figure()
+    
+    # Agregar barras horizontales
+    fig.add_trace(go.Bar(
+        y=df['respuesta'],
+        x=df['porcentaje'],
+        orientation='h',
+        marker=dict(
+            color=df['color'],
+            line=dict(width=0)
+        ),
+        text=[f"{p}%" for p in df['porcentaje']],
+        textposition='inside',
+        textfont=dict(
+            size=16,
+            color='white',
+            family='Arial Black'
+        ),
+        hovertemplate='<b>%{y}</b><br>Porcentaje: %{x}%<extra></extra>',
+        showlegend=False
+    ))
+    
+    # Configurar layout
+    fig.update_layout(
+        title=dict(
+            text=titulo,
+            x=0.5,
+            font=dict(size=24, color='white', family='Arial Black')
+        ),
+        plot_bgcolor='rgba(44, 44, 44, 1)',
+        paper_bgcolor='rgba(44, 44, 44, 1)',
+        font=dict(color='white', size=18, family='Arial'),
+        margin=dict(l=250, r=100, t=80, b=50),  # Margen izquierdo grande para etiquetas
+        height=400,
+        xaxis=dict(
+            showgrid=True,
+            gridwidth=1,
+            gridcolor='rgba(255, 255, 255, 0.1)',
+            showticklabels=False,  # Ocultar etiquetas del eje X
+            range=[0, max(df['porcentaje']) * 1.1]
+        ),
+        yaxis=dict(
+            showgrid=False,
+            tickfont=dict(size=18, color='white', family='Arial Black'),
+            tickmode='array',
+            tickvals=list(range(len(df))),
+            ticktext=df['respuesta'].tolist()
+        )
+    )
+    
+    return fig
+
+# =============================================
+# FUNCIÓN PARA CREAR GRÁFICO MÉTODO 2
+# Con anotaciones personalizadas
+# =============================================
+def crear_grafico_metodo2(df, titulo="Distribución de Respuestas"):
+    """
+    Crea gráfico con anotaciones personalizadas para etiquetas grandes
+    """
+    fig = go.Figure()
+    
+    # Agregar barras horizontales
+    fig.add_trace(go.Bar(
+        y=list(range(len(df))),
+        x=df['porcentaje'],
+        orientation='h',
+        marker=dict(
+            color=df['color'],
+            line=dict(width=0)
+        ),
+        text=[f"{p}%" for p in df['porcentaje']],
+        textposition='inside',
+        textfont=dict(
+            size=16,
+            color='white',
+            family='Arial Black'
+        ),
+        hovertemplate='<b>%{customdata}</b><br>Porcentaje: %{x}%<extra></extra>',
+        customdata=df['respuesta'],
+        showlegend=False
+    ))
+    
+    # Agregar anotaciones para etiquetas grandes
+    for i, (respuesta, porcentaje) in enumerate(zip(df['respuesta'], df['porcentaje'])):
+        fig.add_annotation(
+            x=-max(df['porcentaje']) * 0.05,  # Posición a la izquierda
+            y=i,
+            text=respuesta,
+            showarrow=False,
+            font=dict(size=20, color='white', family='Arial Black'),
+            xanchor='right',
+            yanchor='middle'
+        )
+    
+    # Configurar layout
+    fig.update_layout(
+        title=dict(
+            text=titulo,
+            x=0.5,
+            font=dict(size=24, color='white', family='Arial Black')
+        ),
+        plot_bgcolor='rgba(44, 44, 44, 1)',
+        paper_bgcolor='rgba(44, 44, 44, 1)',
+        font=dict(color='white'),
+        margin=dict(l=300, r=100, t=80, b=50),
+        height=400,
+        xaxis=dict(
+            showgrid=True,
+            gridwidth=1,
+            gridcolor='rgba(255, 255, 255, 0.1)',
+            showticklabels=False,
+            range=[-max(df['porcentaje']) * 0.1, max(df['porcentaje']) * 1.1]
+        ),
+        yaxis=dict(
+            showgrid=False,
+            showticklabels=False,
+            range=[-0.5, len(df) - 0.5]
+        )
+    )
+    
+    return fig
+
+# =============================================
+# FUNCIÓN PARA CREAR GRÁFICO MÉTODO 3
+# Subplot con etiquetas separadas
+# =============================================
+def crear_grafico_metodo3(df, titulo="Distribución de Respuestas"):
+    """
+    Usa subplots para separar completamente etiquetas y barras
+    """
+    # Crear subplot con columnas
+    fig = make_subplots(
+        rows=1, cols=2,
+        column_widths=[0.4, 0.6],  # 40% para etiquetas, 60% para barras
+        horizontal_spacing=0.02,
+        subplot_titles=['', '']
+    )
+    
+    # Columna 1: Solo etiquetas (texto)
+    for i, respuesta in enumerate(df['respuesta']):
+        fig.add_trace(
+            go.Scatter(
+                x=[0],
+                y=[i],
+                mode='text',
+                text=[respuesta],
+                textfont=dict(size=20, color='white', family='Arial Black'),
+                textposition='middle right',
+                showlegend=False,
+                hoverinfo='skip'
+            ),
+            row=1, col=1
+        )
+    
+    # Columna 2: Solo barras
+    fig.add_trace(
+        go.Bar(
+            y=list(range(len(df))),
+            x=df['porcentaje'],
+            orientation='h',
+            marker=dict(
+                color=df['color'],
+                line=dict(width=0)
+            ),
+            text=[f"{p}%" for p in df['porcentaje']],
+            textposition='inside',
+            textfont=dict(
+                size=16,
+                color='white',
+                family='Arial Black'
+            ),
+            hovertemplate='<b>%{customdata}</b><br>Porcentaje: %{x}%<extra></extra>',
+            customdata=df['respuesta'],
+            showlegend=False
+        ),
+        row=1, col=2
+    )
+    
+    # Configurar layout
+    fig.update_layout(
+        title=dict(
+            text=titulo,
+            x=0.5,
+            font=dict(size=24, color='white', family='Arial Black')
+        ),
+        plot_bgcolor='rgba(44, 44, 44, 1)',
+        paper_bgcolor='rgba(44, 44, 44, 1)',
+        font=dict(color='white'),
+        height=400,
+        margin=dict(l=50, r=100, t=80, b=50)
+    )
+    
+    # Configurar ejes
+    fig.update_xaxes(showgrid=False, showticklabels=False, range=[-0.1, 0.1], row=1, col=1)
+    fig.update_yaxes(showgrid=False, showticklabels=False, range=[-0.5, len(df) - 0.5], row=1, col=1)
+    fig.update_xaxes(
+        showgrid=True, 
+        gridwidth=1, 
+        gridcolor='rgba(255, 255, 255, 0.1)', 
+        showticklabels=False,
+        range=[0, max(df['porcentaje']) * 1.1], 
+        row=1, col=2
+    )
+    fig.update_yaxes(showgrid=False, showticklabels=False, range=[-0.5, len(df) - 0.5], row=1, col=2)
+    
+    return fig
+
+# =============================================
+# FUNCIÓN PARA INTEGRAR A TU DASH
+# =============================================
+def crear_grafico_para_dash(data_dict, metodo=1, titulo="Distribución de Respuestas"):
+    """
+    Función principal para usar en tu callback de Dash
+    
+    Args:
+        data_dict: Diccionario con keys 'respuesta', 'porcentaje', 'color'
+        metodo: 1, 2, o 3 para elegir el método
+        titulo: Título del gráfico
+    
+    Returns:
+        Figura de Plotly lista para Dash
+    """
+    df = pd.DataFrame(data_dict)
+    
+    if metodo == 1:
+        return crear_grafico_metodo1(df, titulo)
+    elif metodo == 2:
+        return crear_grafico_metodo2(df, titulo)
+    elif metodo == 3:
+        return crear_grafico_metodo3(df, titulo)
+    else:
+        return crear_grafico_metodo1(df, titulo)
+
+# =============================================
+# EJEMPLO DE USO EN TU CALLBACK DE DASH
+# =============================================
+"""
+# En tu archivo de Dash, agrega este callback:
+
+@app.callback(
+    Output('grafico-barras', 'figure'),
+    Input('algun-input', 'value')
+)
+def actualizar_grafico(input_value):
+    # Procesa tus datos
+    data_dict = {
+        'respuesta': ['No, rara vez', 'No, nunca', 'Sí, ocasionalmente'],
+        'porcentaje': [60.9, 30.4, 8.7],
+        'color': ['#00f5ff', '#ff6b9d', '#ffd93d']
+    }
+    
+    # Crea el gráfico
+    fig = crear_grafico_para_dash(data_dict, metodo=1, titulo="Mi Título")
+    
+    return fig
+"""
+
+# =============================================
+# EJEMPLO DE EJECUCIÓN Y PRUEBA
+# =============================================
+if __name__ == "__main__":
+    import plotly.io as pio
+    
+    # Configurar tema oscuro
+    pio.templates.default = "plotly_dark"
+    
+    print("Creando gráficos de ejemplo...")
+    
+    # Crear los tres métodos
+    fig1 = crear_grafico_metodo1(df, "Método 1: Etiquetas en Eje Y")
+    fig2 = crear_grafico_metodo2(df, "Método 2: Anotaciones Personalizadas")  
+    fig3 = crear_grafico_metodo3(df, "Método 3: Subplots Separados")
+    
+    # Mostrar (descomenta la que quieras ver)
+    # fig1.show()
+    # fig2.show() 
+    # fig3.show()
+    
+    print("¡Gráficos creados exitosamente!")
+    print("Usa crear_grafico_para_dash() en tu callback de Dash")
+
+# =============================================
+# FUNCIÓN ADICIONAL: ADAPTADOR DESDE TUS DATOS
+# =============================================
+def adaptar_datos_eficiencia(df_original, columna_respuesta, columna_valor):
+    """
+    Adapta tus datos existentes al formato requerido
+    
+    Args:
+        df_original: DataFrame con tus datos
+        columna_respuesta: Nombre de la columna con las respuestas/categorías
+        columna_valor: Nombre de la columna con los valores numéricos
+    
+    Returns:
+        Diccionario listo para crear_grafico_para_dash()
+    """
+    # Generar colores automáticamente
+    colores = ['#00f5ff', '#ff6b9d', '#ffd93d', '#4ecdc4', '#45b7d1', '#f9ca24', '#f0932b', '#eb4d4b']
+    
+    data_dict = {
+        'respuesta': df_original[columna_respuesta].tolist(),
+        'porcentaje': df_original[columna_valor].tolist(),
+        'color': colores[:len(df_original)]
+    }
+    
+    return data_dict
